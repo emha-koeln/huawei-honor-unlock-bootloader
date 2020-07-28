@@ -27,7 +27,9 @@ def runOS(cmd):
        result = run(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
        #DEBUG
        print('Shell Result for:', sCmd)
-       print('Returncode: '+str(result.returncode)+'\n', result.stdout, result.stderr)
+       print('Returncode: '+str(result.returncode))
+       print(result.stdout, result.stderr)
+       
 
        return(result)
 
