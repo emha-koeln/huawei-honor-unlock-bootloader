@@ -151,8 +151,7 @@ PLATFORM = platform.system()
 #os.system('adb devices')
 runOS('adb devices')
 
-#imei     = int(input('Type IMEI digit :'))
-imei     = 860325042698084 
+imei     = int(input('Type IMEI digit :'))
 
 checksum = luhn_checksum(imei)
 input('Press any key to reboot your device..\n')
