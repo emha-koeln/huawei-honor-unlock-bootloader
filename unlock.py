@@ -3,6 +3,7 @@
 
 """
 SkyEmie_' 💜 https://github.com/SkyEmie
+emha.koeln
 """
 
 import time
@@ -46,14 +47,9 @@ def tryUnlockBootloader(checksum):
         print("Bruteforce is running... " + str(algoOEMcode)+" "+str(save))
 
         cmd = 'fastboot oem unlock '+ str(algoOEMcode)
-        #command = ['/usr/bin/fastboot', 'oem','unlock', str(algoOEMcode)]
-        #command = cmd.split(' ')
-        # run....
-        #resultWin = runWin(str(command))
-        #print(resultWin)
         result = runOS(cmd)
-        print('DEBUG Result:')
-        print(result.returncode, result.stdout, result.stderr)
+        print('Shell Result for:', cmd)
+        print('Returncode: '+str(result.returncode)+'\n', result.stdout, result.stderr)
 
         sprout = result.stdout + ' ' + result.stderr
         #sdrout = sprout.replace('\n', ' ')
