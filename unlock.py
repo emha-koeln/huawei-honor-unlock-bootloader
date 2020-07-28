@@ -18,29 +18,9 @@ import platform
 PLATFORM ='unknown'
 
 def runOS(cmd):
-     #if os is ...rin, lnx, ...
-     #PLATFORM = platform.system()
-     #print('runOS Running on:', PLATFORM)#platform.system())
 
-     if PLATFORM == 'Linux':
-        print('runOS System:', PLATFORM)
-        cmd = cmd.split(' ')
-        result = runLnx(cmd)
-     elif PLATFORM == 'Windows':
-        print('runOS System:', PLATFORM)
-        #result = os.system(cmd)
-        result = runWin(cmd)
-     else:
-        print('runOS Unkown System:', PLATFORM, 'cmd:', cmd)
-        #result = 'unkown'
-        exit()
-     return result
+    cmd = cmd.split(' ')
 
-def runWin(cmd):
-     result = os.system(cmd)
-     return result
-
-def runLnx(cmd):
     try:
        #command = cmd
        #command = ['fastboot', 'reboot']
