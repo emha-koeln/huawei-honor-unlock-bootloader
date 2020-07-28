@@ -139,8 +139,8 @@ codeOEM = tryUnlockBootloader(checksum)
 input('Press any key ..\n')
 
 # toDo
-os.system('fastboot getvar unlocked')
-os.system('fastboot reboot')
+runOS('fastboot getvar unlocked')
+runOS('fastboot reboot')
 
 print('\n\nDevice unlock ! OEM CODE : '+codeOEM)
 print('(Keep it safe)\n')
