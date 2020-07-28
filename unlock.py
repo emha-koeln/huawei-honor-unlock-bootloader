@@ -24,10 +24,8 @@ def runOS(cmd):
     cmd = cmd.split(' ')
 
     try:
-       #command = cmd
-       #command = ['fastboot', 'reboot']
        result = run(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-       #print('DEBUG runLnx('+str(cmd)+'): ', result.returncode, result.stdout, result.stderr)
+       #DEBUG
        print('Shell Result for:', sCmd)
        print('Returncode: '+str(result.returncode)+'\n', result.stdout, result.stderr)
 
@@ -126,7 +124,7 @@ imei     = int(input('Type IMEI digit :'))
 
 checksum = luhn_checksum(imei)
 input('Press any key to reboot your device..\n')
-#os.system('adb reboot bootloader')
+
 runOS('adb reboot bootloader')
 input('Press any key when your device is ready.. (This may take time, depending on your cpu/serial port)\n')
 
