@@ -20,6 +20,7 @@ PLATFORM ='unknown'
 
 def runOS(cmd):
 
+    sCmd = cmd
     cmd = cmd.split(' ')
 
     try:
@@ -27,6 +28,9 @@ def runOS(cmd):
        #command = ['fastboot', 'reboot']
        result = run(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
        #print('DEBUG runLnx('+str(cmd)+'): ', result.returncode, result.stdout, result.stderr)
+       print('Shell Result for:', sCmd)
+       print('Returncode: '+str(result.returncode)+'\n', result.stdout, result.stderr)
+
        return(result)
 
     except subprocess.CalledProcessError as e:
@@ -48,16 +52,10 @@ def tryUnlockBootloader(checksum):
 
         cmd = 'fastboot oem unlock '+ str(algoOEMcode)
         result = runOS(cmd)
-        print('Shell Result for:', cmd)
-        print('Returncode: '+str(result.returncode)+'\n', result.stdout, result.stderr)
-
+     
         sprout = result.stdout + ' ' + result.stderr
-        #sdrout = sprout.replace('\n', ' ')
         sdrout = sprout.replace('\n', ' ').split(' ')
-        #print('sdrout :', sdrout)
         save  +=1
-        #clear +=1
-        #time.sleep(1)
 
         for i in sdrout:
            #print("sdrout spli = ", i)#, " ", sdrout)
@@ -81,9 +79,6 @@ def tryUnlockBootloader(checksum):
             #    print('i: ', i)
 
             #time.sleep(1)
-
-        #except subprocess.CalledProcessError as e:
-        #    raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
         #if clear == 5:
         #    clear = 0
