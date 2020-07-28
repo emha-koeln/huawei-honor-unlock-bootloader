@@ -45,7 +45,7 @@ def tryUnlockBootloader(checksum):
         #os.system("title Bruteforce is running.. "+str(algoOEMcode)+" "+str(save))
         print("Bruteforce is running... " + str(algoOEMcode)+" "+str(save))
 
-        cmd = '/usr/bin/fastboot oem unlock '+ str(algoOEMcode)
+        cmd = 'fastboot oem unlock '+ str(algoOEMcode)
         #command = ['/usr/bin/fastboot', 'oem','unlock', str(algoOEMcode)]
         #command = cmd.split(' ')
         # run....
