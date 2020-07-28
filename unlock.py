@@ -131,11 +131,12 @@ runOS('adb reboot bootloader')
 input('Press any key when your device is ready.. (This may take time, depending on your cpu/serial port)\n')
 
 codeOEM = tryUnlockBootloader(checksum)
+print('\n\nDevice unlock ! OEM CODE : '+codeOEM)
 input('Press any key ..\n')
 
 # toDo
-os.system('fastboot getvar unlocked')
-os.system('fastboot reboot')
+runOS('fastboot getvar unlocked')
+runOS('fastboot reboot')
 
 print('\n\nDevice unlock ! OEM CODE : '+codeOEM)
 print('(Keep it safe)\n')
