@@ -3,20 +3,24 @@
 
 """
 SkyEmie_' 💜 https://github.com/SkyEmie
-emha-koeln
+emha-koeln, bbb0
 """
 
 import time
 #from flashbootlib import test
 import os
+from os import path 
 import math
 import subprocess
 from subprocess import PIPE, run
 import platform
+import configparser
 
 ##########################################################################################################################
-
+CONF_FILE = 'unlock.conf'
 PLATFORM ='unknown'
+
+##########################################################################################################################
 
 def runOS(cmd):
 
@@ -30,7 +34,6 @@ def runOS(cmd):
        print('Returncode: '+str(result.returncode))
        print(result.stdout, result.stderr)
        
-
        return(result)
 
     except subprocess.CalledProcessError as e:
@@ -40,18 +43,26 @@ def runOS(cmd):
 def tryUnlockBootloader(checksum):
 
     unlock      = False
-    algoOEMcode = 1000000000000000 #base
-    
     save        = 0
+    
+    algoOEMcode = 1000000000000000 #base
+   
+    if config['DEFAULT']['algoOEMcode']:
+        algoOEMcode     = int(config['DEFAULT']['algoOEMcode'])
+    else: 
+        algoOEMcode     = int(config['DEFAULT']['base'])
     #clear       = 0
     os.system('clear')
 
     while(unlock == False):
-        #os.system("title Bruteforce is running.. "+str(algoOEMcode)+" "+str(save))
+  
         print("Bruteforce is running... " + str(algoOEMcode)+" "+str(save))
 
-        cmd = 'fastboot oem unlock '+ str(algoOEMcode)
+        cmd = 'fastboot oem unlock '+ str(algoOEMcode).rjust(16,'0')
         result = runOS(cmd)
+
+        # ToDo: 
+        # if result.returncode == 0:
      
         sprout = result.stdout + ' ' + result.stderr
         sdrout = sprout.replace('\n', ' ').split(' ')
@@ -72,23 +83,16 @@ def tryUnlockBootloader(checksum):
                 print('\n\nSorry, your bootloader has additional protection that other models don\'t have\nI can\'t do anything.. :c\n\n')
                 input('Press any key to exit..\n')
                 exit()
-            #if i.lower() == 'failed':
-            #    print('Failed: ', i)
-
-            #else:
-            #    print('i: ', i)
-
-            #time.sleep(1)
-
-        #if clear == 5:
-        #    clear = 0
-        #    os.system('clear')
 
         if save == 200:
             save = 0
-            bak = open("unlock_code.txt", "w")
-            bak.write("If you need to pick up where you left off,\nchange the algoOEMcode variable with #base comment to the following value :\n"+str(algoOEMcode))
-            bak.close()
+            
+            config['DEFAULT']['algoOEMcode'] = str(algoOEMcode)
+            with open(CONF_FILE, 'w') as f:
+                config.write(f)
+            # bak = open("unlock_code.txt", "w")
+            # bak.write("If you need to pick up where you left off,\nchange the algoOEMcode variable with #base comment to the following value :\n"+str(algoOEMcode))
+            # bak.close()
 
         algoOEMcode = algoIncrementChecksum(algoOEMcode, checksum)
 
@@ -115,23 +119,40 @@ def luhn_checksum(imei):
 print('\n\n           Unlock Bootloader script - By SkyEmie_\'')
 print('\n\n  (Please enable USB DEBBUG and OEM UNLOCK if the device isn\'t appear..)')
 print('  /!\ All data will be erased /!\\\n')
-input(' Press any key to detect device..\n')
+input(' Press Enter to detect device..\n')
 
-PLATFORM = platform.system()
+
+config = configparser.ConfigParser()
+config['DEFAULT'] = {'imei': '',
+                      'base': '1000000000000000',
+                      'algoOEMcode': ''}
+if not path.exists(CONF_FILE):
+    with open(CONF_FILE, 'w') as f:
+        config.write(f)
+
+config.read(CONF_FILE)
 
 #os.system('adb devices')
 runOS('adb devices')
 
-imei     = int(input('Type IMEI digit :'))
-
+if not config['DEFAULT']['imei']:
+    imei     = int(input('Type IMEI digit :'))
+    config['DEFAULT']['imei'] = str(imei)
+    with open(CONF_FILE, 'w') as f:
+       config.write(f)
+else:
+    imei = int(config['DEFAULT']['imei'])  
+    print('INFO: found IMEI in', CONF_FILE+":", imei)
+    
 checksum = luhn_checksum(imei)
-input('Press any key to reboot your device..\n')
+input('Press Enter to reboot your device..\n')
 
 runOS('adb reboot bootloader')
 input('Press any key when your device is ready.. (This may take time, depending on your cpu/serial port)\n')
 
 codeOEM = tryUnlockBootloader(checksum)
-input('Press any key ..\n')
+print('Device unlocked! OEM CODE: '+codeOEM)
+input('Press Enter\n')
 
 # toDo
 runOS('fastboot getvar unlocked')
