@@ -1,5 +1,14 @@
 ## Huawei-honor-unlock-bootloader (Python 3) / subls
 
+## subls
+subls, Second Unlock BootLoader Script
+a fork of https://github.com/SkyEmie/huawei-honor-unlock-bootloader
+
+- win and linux
+- Luhn Checksum and Numeric brutforce
+- select your device with adb and fastboot
+- save brutforce-state 
+
 ## Summary
   
 After closing the official EMUI website, which allowed you to retrieve the code to unlock the bootloader of Huawei/Honor phones, here is a python script to retrieve it by yourself.
