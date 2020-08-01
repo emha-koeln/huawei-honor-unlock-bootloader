@@ -11,11 +11,8 @@ A fork of https://github.com/SkyEmie/huawei-honor-unlock-bootloader
 - save brutforce-state 
 
 start with smth- like:
-> ./subls.py
-
-  or
-  
-C:\WINDOWS\system32> python subls.py
+ - > ./subls.py
+ - C:\WINDOWS\system32> python subls.py
 
 ## Summary (from SkyEmie)
   
