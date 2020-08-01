@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-SkyEmie_' 💜 https://github.com/SkyEmie
-emha-koeln, bbb0
+emha-koeln, SkyEmie, bbb0
 """
 
 import time
 #from flashbootlib import test
 import os
 from os import path 
+
 import math
 import subprocess
 from subprocess import PIPE, run
+
 import platform
 import configparser
 import argparse
@@ -54,8 +55,6 @@ def runOS(cmd, iVerboselevel=1): #0silent 1stdout/err 2cmd and stdout7err 3 was 
            print('Shell Result for:', sCmd)
            print('Returncode:', str(result.returncode))
            print(result.stdout, result.stderr)
-
-       #else:
            
        return(result)
 
@@ -73,7 +72,7 @@ def testADBDevice(sSN="0"):
     while(found == ''):
        #cls()
        #print('adb devices: Waiting for devices...')
-       result = runOS("adb devices", 0)
+       result = runOS("adb devices", 2)
        found = result.stdout
        time.sleep(1)
        
@@ -110,7 +109,7 @@ def testADBDevice(sSN="0"):
 def testFastbootDevice(sSN="0"):
   
     found = ''
-    sSearchSN = sSN
+    #sSearchSN = sSN
   
     #if sSN == 'unknown':
     #    sSN='0'
@@ -142,10 +141,10 @@ def testFastbootDevice(sSN="0"):
                 devs.append(i[:16])
                 
                 if str(sSN) == str(i[:16]):
-                    print('INFO: Found your device', i[:16],  )
+                    print('INFO: Found your device', i[:16])
                     return(sSN)
             
-    print('INFO: Couldn\'t find your device')
+    print('INFO: Couldn\'t find your device', sSN)
     #print(len(devs)) 
     #print(devs) 
     print('Select device: ')
@@ -158,9 +157,7 @@ def testFastbootDevice(sSN="0"):
     #    cls()
     #    runOS('fastboot oem get-product-model')
     #    input('Press Enter ...')
-
-
-    
+  
     return(devs[int(iDev)])
 
 ##########################################################################################################################
@@ -222,7 +219,7 @@ def initNumeric():
        with open(CONF_FILE, 'w') as f:
            config.write(f)
     else:       
-        print('INFO: found a saved number from last run', CONF_FILE+":", config['DEFAULT']['lastNumeric'])
+        print('INFO: found a saved number from last run in', CONF_FILE+":", config['DEFAULT']['lastNumeric'])
         default = str(config['DEFAULT']['lastNumeric'])
         #print(default)
         lastNum = str(input('Press Enter to continue with last run or enter a new start number: ') or 'n')
@@ -235,7 +232,6 @@ def initNumeric():
     
         else:
            print('INFO: continuing with', lastNum)
-           #lastNum     = int(input('Enter new number to start from:'))
            config['DEFAULT']['lastNumeric'] = str(lastNum)
            with open(CONF_FILE, 'w') as f:
               config.write(f)
@@ -427,9 +423,6 @@ def luhn_checksum(imei):
         checksum += sum(digits_of(i*2))
     return checksum % 10
 
-##########################################################################################################################
-
-
 
 ##########################################################################################################################
 ## start here
@@ -469,14 +462,14 @@ config.read(CONF_FILE)
 # 'main'
 cls()
 print('Second Unlock Bootloader script ')
-print('usage: subls.py/unlock.py [-h] [-i IMEI] [-b BASE] [-o OEM] [-v] [--lock LOCK]\n')
+print('usage: subls.py [-h] [-i IMEI] [-b BASE] [-o OEM] [-v] [--lock LOCK]\n')
 print('#########################################################################################')
 print('based on:  ')
 print('                   Unlock Bootloader script - By SkyEmie_\'')
-print('                      with ideas from bbb0, taskula from github')
+print('                   with ideas from bbb0, taskula from github')
 print('\n  (Please enable USB DEBBUG and OEM UNLOCK if the device doesn\'t appear..)')
 #print('\n                      (Try to enable MY_MIND = too)')
-print('\n          /!\ All data will or may or could or should be erased /!\\\n')
+print('\n           /!\ All data will or may or could or should be erased /!\\\n')
 print('#########################################################################################\n')
 
 # TODO: let the user decide
@@ -497,7 +490,7 @@ input('Press [Enter] to run > adb devices')
 
 if not config['DEFAULT']['SN']:
     #cls()
-    runOS('adb devices', 2)
+    runOS('adb devices', 1)
     SN = testADBDevice()
     # if args.verbose:
     #input('Press Enter ...')
@@ -508,13 +501,15 @@ if not config['DEFAULT']['SN']:
     #print('INFO: Working on device', SN)
 else:
     #cls()
-    print('INFO: found SN in', CONF_FILE+":", config['DEFAULT']['SN'])
+    print('INFO: > adb devices wasn\'t executed')
+    print('      found SN in', CONF_FILE+":", config['DEFAULT']['SN'])
     SN = config['DEFAULT']['SN']
+
 
 input('Press [Enter] continue with device '+ SN)
 cls()
 #print(SN)
-print('STEP 2: run fastboot to detect your device')
+print('STEP 2: run fastboot to detect and select your device')
     
 if str(SN) == '0000000000000000':
     #print('WARNING: All adb-devices will reboot!')              
@@ -532,7 +527,6 @@ with open(CONF_FILE, 'w') as f:
 #print('INFO: Working on device', SN)
 
 input('Press [Enter] to continue... ')
-
 
 cls()
 
