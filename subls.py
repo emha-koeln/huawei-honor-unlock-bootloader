@@ -17,10 +17,10 @@ from subprocess import PIPE, run
 import platform
 import configparser
 import argparse
-import time
+#import time
 
 ##########################################################################################################################
-VERSION         = '0.1.1.01'
+VERSION         = '0.1.1.202008011531'
 CONF_FILE       = 'subls.conf'
 UNLOCKCODE_FILE = 'unlock_code.txt'
 PLATFORM        = 'unknown'
@@ -150,7 +150,8 @@ def testFastbootDevice(sSN="0"):
         iDevs.append(i)
         print(i, devs[i])   
     iDev = input(iDevs or '0')
-            
+    if iDev == '':
+        iDev = 0     
     #if args.verbose:
     #    cls()
     #    runOS('fastboot oem get-product-model')
