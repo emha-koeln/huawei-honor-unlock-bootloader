@@ -10,7 +10,7 @@ A fork of https://github.com/SkyEmie/huawei-honor-unlock-bootloader
 - select your device with adb and fastboot
 - save brutforce-state 
 
-## Summary
+## Summary (from SkyEmie)
   
 After closing the official EMUI website, which allowed you to retrieve the code to unlock the bootloader of Huawei/Honor phones, here is a python script to retrieve it by yourself.
 
@@ -26,7 +26,7 @@ I've only had the opportunity to test it on European versions only :
   
   
   
-## Instructions
+## Instructions (from SkyEmie)
 ### Connecting a device in ADB mode
   
 1. Enable developer options in Android.  
@@ -43,7 +43,7 @@ The device is going to ask for authorisation, which you'll have to allow.
   
   
   
-## FAQ & Troubleshooting  
+## FAQ & Troubleshooting (from SkyEmie) 
   
 **- The application doesn't work. Is there anything I should have installed?**  
 Yes, it was developed in python so it needs it to run, version 3. You can install the latest version from [here](https://www.python.org/downloads/) or by using Windows Store.
