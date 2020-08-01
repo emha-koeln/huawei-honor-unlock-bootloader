@@ -20,6 +20,7 @@ import argparse
 import time
 
 ##########################################################################################################################
+VERSION         = '0.1.1.01'
 CONF_FILE       = 'subls.conf'
 UNLOCKCODE_FILE = 'unlock_code.txt'
 PLATFORM        = 'unknown'
@@ -41,7 +42,6 @@ def runOS(cmd, iVerboselevel=1): #0silent 1stdout/err 2cmd and stdout7err 3 was 
 
     try:
        result = run(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-       #DEBUG
        #if args.verbose:
        if iVerboselevel == 1:
            #print(sCmd)
@@ -70,7 +70,6 @@ def testADBDevice(sSN="0"):
     iDev = 0
     
     while(found == ''):
-       #cls()
        #print('adb devices: Waiting for devices...')
        result = runOS("adb devices", 2)
        found = result.stdout
@@ -109,8 +108,7 @@ def testADBDevice(sSN="0"):
 def testFastbootDevice(sSN="0"):
   
     found = ''
-    #sSearchSN = sSN
-  
+ 
     #if sSN == 'unknown':
     #    sSN='0'
     iCount = 0
@@ -461,7 +459,7 @@ config.read(CONF_FILE)
 ########
 # 'main'
 cls()
-print('Second Unlock Bootloader script ')
+print('Second Unlock Bootloader script '+VERSION)
 print('usage: subls.py [-h] [-i IMEI] [-b BASE] [-o OEM] [-v] [--lock LOCK]\n')
 print('#########################################################################################')
 print('based on:  ')
@@ -484,7 +482,7 @@ input('Press [Enter] if you know, what you are going to do')
 ## go on
 
 cls()
-print('STEP 1: run adb to detect and reboot your device into fastboot-mode')
+print('STEP 1: run > adb devices to detect and reboot your device into fastboot-mode')
 input('Press [Enter] to run > adb devices')
 #cls()
 
@@ -505,11 +503,11 @@ else:
     print('      found SN in', CONF_FILE+":", config['DEFAULT']['SN'])
     SN = config['DEFAULT']['SN']
 
-
 input('Press [Enter] continue with device '+ SN)
 cls()
+
 #print(SN)
-print('STEP 2: run fastboot to detect and select your device')
+print('STEP 2: run > fastboot to detect and select your device')
     
 if str(SN) == '0000000000000000':
     #print('WARNING: All adb-devices will reboot!')              
@@ -527,7 +525,6 @@ with open(CONF_FILE, 'w') as f:
 #print('INFO: Working on device', SN)
 
 input('Press [Enter] to continue... ')
-
 cls()
 
 print('STEP 3: Choose brutforce methode:')
