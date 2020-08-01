@@ -1,7 +1,7 @@
 ## Huawei-honor-unlock-bootloader (Python 3) / subls
 
 ## Second Unlock BootLoader Script
-subls, Second Unlock BootLoader Script
+subls.py, Second Unlock BootLoader Script v0.1.x
 
 A fork of https://github.com/SkyEmie/huawei-honor-unlock-bootloader
 
