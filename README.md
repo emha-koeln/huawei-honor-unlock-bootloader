@@ -12,8 +12,10 @@ A fork of https://github.com/SkyEmie/huawei-honor-unlock-bootloader
 
 start with smth- like:
 > ./subls.py
+
   or
-C:\WINDOWS\system32> python
+  
+C:\WINDOWS\system32> python subls.py
 
 ## Summary (from SkyEmie)
   
