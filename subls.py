@@ -20,7 +20,7 @@ import argparse
 #import time
 
 ##########################################################################################################################
-VERSION         = '0.1.1.202008011531'
+VERSION         = '0.1.1.20200802'
 CONF_FILE       = 'subls.conf'
 UNLOCKCODE_FILE = 'unlock_code.txt'
 PLATFORM        = 'unknown'
@@ -164,7 +164,14 @@ def testFastbootDevice(sSN="0"):
 
 def initLuhn():
     # IMEI
-    if not config['DEFAULT']['imei']:
+    if args.imei:
+        print('INFO: using', args.imei, 'as IMEI')
+        imei     = args.imei
+        checksum = luhn_checksum(imei)
+        print('INFO: Luhn checksum is: '+str(checksum))
+        input('wait')
+    
+    elif not config['DEFAULT']['imei']:
         print('Enter IMEI:')
         imei     = int(input('Type IMEI digit :'))
         checksum = luhn_checksum(imei)
@@ -176,7 +183,12 @@ def initLuhn():
     else:
         print('INFO: found IMEI in', CONF_FILE+":", config['DEFAULT']['imei'])
         print('        checksum in', CONF_FILE+":", config['DEFAULT']['checksum'])
-        print('      last code was', CONF_FILE+":", config['DEFAULT']['algoOEMcode'])
+        
+        
+        if args.base:
+            print('                   new base -b:', args.base)
+        else:
+            print('      last code was', CONF_FILE+":", config['DEFAULT']['algoOEMcode'])
         
         if not int(config['DEFAULT']['checksum']) == int(luhn_checksum(config['DEFAULT']['imei'])):
             print('INFO: Luhn checksum\('+str(luhn_checksum(config['DEFAULT']['imei']))+
@@ -211,7 +223,7 @@ def initNumeric():
     
     lastNum = 0
     if not config['DEFAULT']['lastNumeric']:
-       lastNum     = input('Enter new number to start from:')
+       lastNum     = input('Enter new number to start from: (Default=0)')
        if lastNum == '':
            lastNum = 0
        config['DEFAULT']['lastNumeric'] = str(lastNum)
@@ -324,7 +336,9 @@ def tryUnlockBootloader(checksum):
     unlock      = False
     save        = 0 
          
-    if config['DEFAULT']['algoOEMcode']:
+    if args.base:
+        algoOEMcode     = int(args.base)
+    elif config['DEFAULT']['algoOEMcode']:
         algoOEMcode     = int(config['DEFAULT']['algoOEMcode'])
     else: 
         algoOEMcode     = int(config['DEFAULT']['base'])
@@ -379,18 +393,23 @@ def tryUnlockBootloader(checksum):
         if save == 200:
             save = 0
             
-            config['DEFAULT']['algoOEMcode'] = str(algoOEMcode)
-            with open(CONF_FILE, 'w') as f:
-                config.write(f)
-            # bak = open("unlock_code.txt", "w")
-            # bak.write("If you need to pick up where you left off,\nchange the algoOEMcode variable with #base comment to the following value :\n"+str(algoOEMcode))
-            # bak.close()
+            if not args.imei and not args.base:
+            
+                config['DEFAULT']['algoOEMcode'] = str(algoOEMcode)
+                with open(CONF_FILE, 'w') as f:
+                    config.write(f)
+                # bak = open("unlock_code.txt", "w")
+                # bak.write("If you need to pick up where you left off,\nchange the algoOEMcode variable with #base comment to the following value :\n"+str(algoOEMcode))
+                # bak.close()
 
         algoOEMcode = algoIncrementChecksum(algoOEMcode, checksum)
 
         if algoOEMcode > 9999999999999999:
             #input('> 9999999999999999 Press Enter...')
-            algoOEMcode =  int(config['DEFAULT']['base'])
+            if args.base:
+                algoOEMcode = args.base
+            else:
+                algoOEMcode = int(config['DEFAULT']['base'])
             checksum += 1
             if str(checksum)[-1:] == str(luhn_checksum(imei)):
                 print('INFO: Giving up.')
@@ -406,7 +425,10 @@ def tryUnlockBootloader(checksum):
 ## algo and luhn checksum               
                
 def algoIncrementChecksum(genOEMcode, checksum):
-    genOEMcode+=int(checksum+math.sqrt(int(config['DEFAULT']['imei']))*1024)
+    if args.imei:
+        genOEMcode+=int(checksum+math.sqrt(int(args.imei))*1024)
+    else:    
+        genOEMcode+=int(checksum+math.sqrt(int(config['DEFAULT']['imei']))*1024)
     return(genOEMcode)
 
 
@@ -428,13 +450,22 @@ def luhn_checksum(imei):
 
 PLATFORM = platform.system()
 
+#def main():
 ########
 # args
 # Todo
-parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--imei', help='use this as IMEI (TODO)')
-parser.add_argument('-b', '--base', help='use this as base (TODO)')
-parser.add_argument('-o', '--oem' , help='use this as last OEM Code (TODO)')
+parser = argparse.ArgumentParser(
+#        prog='skubls.py',
+        description=('''\
+         Note that command-line arguments are not stored!
+         ''')
+        )
+parser.add_argument('-s', '--sn', help='use this as serialnumber')
+parser.add_argument('-m', '--method', choices=['luhn', 'numeric'],
+                    help='use this as brute-force method')
+parser.add_argument('-i', '--imei', help='use this as IMEI')
+parser.add_argument('-b', '--base', help='use this as base')
+#parser.add_argument('-o', '--oem' , help='use this as last OEM Code (TODO)')
 parser.add_argument('-v', '--verbose', help="increase output verbosity", action="store_true")
 parser.add_argument('--lock', help='lock your device (TODO)')
 args = parser.parse_args()
@@ -460,8 +491,12 @@ config.read(CONF_FILE)
 ########
 # 'main'
 cls()
+#print(args)
+#parser.print_help()
+#print("Running '{}'".format(__file__))
+
 print('Second Unlock Bootloader script '+VERSION)
-print('usage: subls.py [-h] [-i IMEI] [-b BASE] [-o OEM] [-v] [--lock LOCK]\n')
+print('usage: subls.py [-h] [-m {luhn,numeric}] [-i IMEI] [-b BASE] [-v] [--lock LOCK]\n')
 print('#########################################################################################')
 print('based on:  ')
 print('                   Unlock Bootloader script - By SkyEmie_\'')
@@ -487,7 +522,12 @@ print('STEP 1: run > adb devices to detect and reboot your device into fastboot-
 input('Press [Enter] to run > adb devices')
 #cls()
 
-if not config['DEFAULT']['SN']:
+if args.sn:
+    print('INFO: > adb devices wasn\'t executed')
+    print('      Using -s', args.sn)
+    SN = args.sn
+
+elif not config['DEFAULT']['SN']:
     #cls()
     runOS('adb devices', 1)
     SN = testADBDevice()
@@ -527,29 +567,35 @@ with open(CONF_FILE, 'w') as f:
 
 input('Press [Enter] to continue... ')
 cls()
-
-print('STEP 3: Choose brutforce methode:')
-print('0 Last run ('+config['DEFAULT']['methode']+')')
-print('1 Luhn Checksum')
-print('2 Numeric:')
-num = input('[0, 1, 2]' or '0')
-if num == '1':
-    config['DEFAULT']['methode'] = str('luhn')
-    with open(CONF_FILE, 'w') as f:
-        config.write(f)
-    codeOEM = tryUnlockBootloader(initLuhn())
-    
-elif num == '2':
-    config['DEFAULT']['methode'] = str('numeric')
-    with open(CONF_FILE, 'w') as f:
-        config.write(f)
-    codeOEM = tryUnlockNumeric(initNumeric())
-    
-else:
-    if config['DEFAULT']['methode'] == 'luhn':
+if args.method:
+    print('STEP 3: Choose brutforce methode:', args.method)
+    if args.method == 'luhn':
         codeOEM = tryUnlockBootloader(initLuhn())
-    elif config['DEFAULT']['methode'] == 'numeric':
+    elif args.method == 'numeric':  
         codeOEM = tryUnlockNumeric(initNumeric())
+else:
+    print('STEP 3: Choose brutforce methode:')
+    print('0 Last run ('+config['DEFAULT']['methode']+')')
+    print('1 Luhn Checksum')
+    print('2 Numeric:')
+    num = input('[0, 1, 2]' or '0')
+    if num == '1':
+        config['DEFAULT']['methode'] = str('luhn')
+        with open(CONF_FILE, 'w') as f:
+            config.write(f)
+        codeOEM = tryUnlockBootloader(initLuhn())
+        
+    elif num == '2':
+        config['DEFAULT']['methode'] = str('numeric')
+        with open(CONF_FILE, 'w') as f:
+            config.write(f)
+        codeOEM = tryUnlockNumeric(initNumeric())
+        
+    else:
+        if config['DEFAULT']['methode'] == 'luhn':
+            codeOEM = tryUnlockBootloader(initLuhn())
+        elif config['DEFAULT']['methode'] == 'numeric':
+            codeOEM = tryUnlockNumeric(initNumeric())
 
 print('Device unlocked! OEM CODE: '+codeOEM)
 print('INFO: OEM CODE saved in', UNLOCKCODE_FILE)
@@ -566,3 +612,7 @@ print('(Keep it safe)\n')
 
 input('Press Enter to exit..\n')
 exit()
+    
+#if __name__ == "__main__":
+#        main()
+        
